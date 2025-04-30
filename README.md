@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ConsultMe Project
 
-## Getting Started
+This project is a Next.js application using TypeScript, PNPM, PostgreSQL (via Docker), and Drizzle ORM.
 
-First, run the development server:
+## Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js (v20 or later recommended)
+- PNPM (Install via `npm install -g pnpm`)
+- Docker and Docker Compose
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1.  **Clone the repository:**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2.  **Install dependencies:**
 
-## Learn More
+    ```bash
+    pnpm install
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+3.  **Set up environment variables:**
+    Create a `.env` file in the root of the project and add the following variables (replace placeholder values as needed):
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    ```env
+    OPENAI_API_KEY=<your_openai_api_key>
+    POSTGRES_USER=postgres
+    POSTGRES_PASSWORD=postgres
+    POSTGRES_DB=consultme
+    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/consultme
+    REPLICATE_API_TOKEN=<your_replicate_api_token>
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+    _Note: The `DATABASE_URL` should match the credentials used by Docker Compose._
 
-## Deploy on Vercel
+4.  **Start the PostgreSQL database:**
+    Make sure Docker Desktop (or your Docker daemon) is running. Then, in the project root directory, run:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+    ```bash
+    docker-compose up -d
+    ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    This command starts the PostgreSQL container in detached mode.
+
+5.  **Set up the database schema:**
+    ```bash
+    pnpm drizzle-kit push
+    ```
+
+## Running the Application
+
+1.  **Start the development server:**
+
+    ```bash
+    pnpm dev
+    ```
+
+    This will start the Next.js application in development mode with Turbopack.
+
+2.  Open your browser and navigate to `http://localhost:3000/dashboard/projects` (or the port specified in the terminal output).
+
+## Other Useful Commands
+
+- **Build for production:**
+  ```bash
+  pnpm build
+  ```
+- **Run production server:**
+  ```bash
+  pnpm start
+  ```
+- **Lint the code:**
+  ```bash
+  pnpm lint
+  ```
+- **Stop the database container:**
+  ```bash
+  docker-compose down
+  ```
