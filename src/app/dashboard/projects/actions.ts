@@ -1,7 +1,11 @@
 "use server";
 
 import { db } from "@/db";
-import { deleteProject, getLatestProject } from "@/db/projects";
+import {
+  deleteProject,
+  getLatestProject,
+  updateProjectName,
+} from "@/db/projects";
 import { projects } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -34,4 +38,11 @@ export async function createEmptyProjectAction() {
     });
 
   redirect(`/dashboard/projects/${project.id}`);
+}
+
+export async function updateProjectNameAction(id: string, name: string) {
+  await updateProjectName(id, name);
+
+  revalidatePath("/dashboard/projects");
+  revalidatePath(`/dashboard/projects/${id}`);
 }
