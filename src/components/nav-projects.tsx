@@ -1,18 +1,11 @@
 "use client";
 
-import {
-  Folder,
-  MoreHorizontal,
-  Share,
-  Trash2,
-  type LucideIcon,
-} from "lucide-react";
+import { MoreHorizontal, Plus, Trash2 } from "lucide-react";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -24,29 +17,34 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import Link from "next/link";
 
 export function NavProjects({
   projects,
+  onDelete,
+  onCreate,
 }: {
   projects: {
+    id: string;
     name: string;
-    url: string;
     emoji: string;
   }[];
+  onDelete: (id: string) => Promise<void> | void;
+  onCreate: () => Promise<void> | void;
 }) {
   const { isMobile } = useSidebar();
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel>Products</SidebarGroupLabel>
+      <SidebarGroupLabel>Projects</SidebarGroupLabel>
       <SidebarMenu>
         {projects.map((item) => (
-          <SidebarMenuItem key={item.name}>
+          <SidebarMenuItem key={item.id}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <Link href={`/dashboard/projects/${item.id}`}>
                 <span>{item.emoji}</span>
                 <span>{item.name}</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -60,16 +58,7 @@ export function NavProjects({
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem>
-                  <Folder className="text-muted-foreground" />
-                  <span>View Project</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Share className="text-muted-foreground" />
-                  <span>Share Project</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => onDelete(item.id)}>
                   <Trash2 className="text-muted-foreground" />
                   <span>Delete Project</span>
                 </DropdownMenuItem>
@@ -78,9 +67,9 @@ export function NavProjects({
           </SidebarMenuItem>
         ))}
         <SidebarMenuItem>
-          <SidebarMenuButton>
-            <MoreHorizontal />
-            <span>More</span>
+          <SidebarMenuButton onClick={onCreate}>
+            <Plus />
+            <span>New Project</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
