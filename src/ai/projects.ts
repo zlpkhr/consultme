@@ -4,6 +4,7 @@ import { randomUUID } from "crypto";
 import { writeFile } from "fs/promises";
 import Replicate from "replicate";
 import { z } from "zod";
+
 export const refindeProductDescription = async (description: string) => {
   const refinedDescription = await generateText({
     model: openai("gpt-4o"),
