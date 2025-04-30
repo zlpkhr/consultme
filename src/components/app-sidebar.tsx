@@ -137,17 +137,17 @@ const data = {
     {
       name: "Design Engineering",
       url: "#",
-      icon: Frame,
+      emoji: "🎨",
     },
     {
       name: "Sales & Marketing",
       url: "#",
-      icon: PieChart,
+      emoji: "💼",
     },
     {
       name: "Travel",
       url: "#",
-      icon: Map,
+      emoji: "🚗",
     },
   ],
 };
