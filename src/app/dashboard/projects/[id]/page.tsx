@@ -1,4 +1,4 @@
-import { getProject, getProjectStage } from "@/db/projects";
+import { getProject } from "@/db/projects";
 import { notFound } from "next/navigation";
 import { ProjectDetails } from "./project-details";
 
@@ -14,7 +14,5 @@ export default async function ProjectPage({
     return notFound();
   }
 
-  const stage = await getProjectStage(id);
-
-  return <ProjectDetails project={{ ...project, stage }} />;
+  return <ProjectDetails project={project} />;
 }

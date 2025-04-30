@@ -1,10 +1,17 @@
 "use client";
 
 import { Project } from "@/db/schema";
-import { updateProjectProductDescriptionAction } from "../actions";
+import { useState } from "react";
+import {
+  generateTargetAudienceAction,
+  updateProjectProductDescriptionAction,
+  updateProjectStageAction,
+} from "../actions";
 import { ProductDescriptionForm } from "./product-description-form";
 import { ProjectHeader } from "./project-header";
-import { useState } from "react";
+import { RefinedProjectDescription } from "./refined-project-description";
+import { TargetAudienceList } from "./target-audience-list";
+import { TargetAudience } from "@/db/projects";
 
 export function ProjectDetails({
   project,
@@ -19,14 +26,44 @@ export function ProjectDetails({
     setLoading(false);
   };
 
+  const [generatingTargetAudience, setGeneratingTargetAudience] =
+    useState(false);
+
+  const handleProjectDescriptionRefinementNext = async () => {
+    setGeneratingTargetAudience(true);
+    await generateTargetAudienceAction(project.id);
+    setGeneratingTargetAudience(false);
+  };
+
+  const handleProjectDescriptionRefinementPrevious = async () => {
+    setLoading(true);
+    await updateProjectStageAction(project.id, "productDescriptionEntry");
+    setLoading(false);
+  };
+
   return (
     <div className="flex flex-col gap-6 p-8">
       <ProjectHeader project={project} />
-      {project.stage === "productDescription" && (
+      {project.stage === "productDescriptionEntry" && (
         <ProductDescriptionForm
           loading={loading}
           initialDescription={project.productDescription ?? undefined}
           onNext={handleNext}
+        />
+      )}
+      {project.stage === "refinedProductDescriptionReview" &&
+        !generatingTargetAudience && (
+          <RefinedProjectDescription
+            refinedProductDescription={project.refinedProductDescription ?? ""}
+            onPrevious={handleProjectDescriptionRefinementPrevious}
+            onNext={handleProjectDescriptionRefinementNext}
+          />
+        )}
+      {(project.stage === "targetAudienceReview" ||
+        generatingTargetAudience) && (
+        <TargetAudienceList
+          generatingTargetAudience={generatingTargetAudience}
+          targetAudience={(project.targetAudience as TargetAudience[]) ?? []}
         />
       )}
     </div>

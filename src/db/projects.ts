@@ -45,26 +45,6 @@ export async function updateProjectName(id: string, name: string) {
   await db.update(projects).set({ name }).where(eq(projects.id, id));
 }
 
-export async function getProjectStage(id: string) {
-  const project = await db.query.projects.findFirst({
-    where: eq(projects.id, id),
-  });
-
-  if (!project) {
-    throw new Error("Project not found");
-  }
-
-  if (project.productDescription == null) {
-    return "productDescription";
-  }
-
-  if (project.refinedProductDescription == null) {
-    return "refinedProductDescription";
-  }
-
-  return "targetAudience";
-}
-
 export async function updateProjectProductDescription(
   id: string,
   description: string
@@ -73,4 +53,37 @@ export async function updateProjectProductDescription(
     .update(projects)
     .set({ productDescription: description })
     .where(eq(projects.id, id));
+}
+
+export async function updateProjectRefinedProductDescription(
+  id: string,
+  description: string
+) {
+  await db
+    .update(projects)
+    .set({ refinedProductDescription: description })
+    .where(eq(projects.id, id));
+}
+
+export async function updateProjectStage(id: string, stage: string) {
+  await db.update(projects).set({ stage }).where(eq(projects.id, id));
+}
+
+export type TargetAudience = {
+  name: string;
+  age: number;
+  ethnicity: string;
+  country: string;
+  gender: string;
+  location: string;
+  interests: string[];
+  needs: string[];
+  avatar: string;
+};
+
+export async function updateProjectTargetAudience(
+  id: string,
+  targetAudience: TargetAudience[]
+) {
+  await db.update(projects).set({ targetAudience }).where(eq(projects.id, id));
 }
