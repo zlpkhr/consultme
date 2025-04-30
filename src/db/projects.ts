@@ -44,3 +44,33 @@ export async function getProject(id: string) {
 export async function updateProjectName(id: string, name: string) {
   await db.update(projects).set({ name }).where(eq(projects.id, id));
 }
+
+export async function getProjectStage(id: string) {
+  const project = await db.query.projects.findFirst({
+    where: eq(projects.id, id),
+  });
+
+  if (!project) {
+    throw new Error("Project not found");
+  }
+
+  if (project.productDescription == null) {
+    return "productDescription";
+  }
+
+  if (project.refinedProductDescription == null) {
+    return "refinedProductDescription";
+  }
+
+  return "targetAudience";
+}
+
+export async function updateProjectProductDescription(
+  id: string,
+  description: string
+) {
+  await db
+    .update(projects)
+    .set({ productDescription: description })
+    .where(eq(projects.id, id));
+}

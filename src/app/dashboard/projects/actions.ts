@@ -5,6 +5,7 @@ import {
   deleteProject,
   getLatestProject,
   updateProjectName,
+  updateProjectProductDescription,
 } from "@/db/projects";
 import { projects } from "@/db/schema";
 import { revalidatePath } from "next/cache";
@@ -42,6 +43,16 @@ export async function createEmptyProjectAction() {
 
 export async function updateProjectNameAction(id: string, name: string) {
   await updateProjectName(id, name);
+
+  revalidatePath("/dashboard/projects");
+  revalidatePath(`/dashboard/projects/${id}`);
+}
+
+export async function updateProjectProductDescriptionAction(
+  id: string,
+  description: string
+) {
+  await updateProjectProductDescription(id, description);
 
   revalidatePath("/dashboard/projects");
   revalidatePath(`/dashboard/projects/${id}`);
