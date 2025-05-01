@@ -63,9 +63,6 @@ export default function SignupPage() {
     setIsLoading(true);
 
     try {
-      // Here you would typically call your registration API
-      console.log(values);
-
       // Simulate registration success
       setTimeout(() => {
         router.push("/dashboard");

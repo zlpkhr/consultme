@@ -87,3 +87,32 @@ export async function updateProjectTargetAudience(
 ) {
   await db.update(projects).set({ targetAudience }).where(eq(projects.id, id));
 }
+
+export async function updateProjectReport(id: string, report: string) {
+  try {
+    const existingProject = await db.query.projects.findFirst({
+      where: eq(projects.id, id),
+    });
+
+    if (!existingProject) {
+      console.error(`Project ${id} not found`);
+      throw new Error(`Project ${id} not found`);
+    }
+
+    await db.update(projects).set({ report }).where(eq(projects.id, id));
+
+    const updatedProject = await db.query.projects.findFirst({
+      where: eq(projects.id, id),
+    });
+
+    if (!updatedProject || !updatedProject.report) {
+      console.error(`Failed to update project ${id} report`);
+      throw new Error(`Failed to update project ${id} report`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error(`Error updating project ${id} report:`, error);
+    throw error;
+  }
+}

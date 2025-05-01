@@ -2,6 +2,7 @@
 
 import {
   generateAvatar,
+  generateReport,
   generateTargetAudience,
   refindeProductDescription,
 } from "@/ai/projects";
@@ -10,9 +11,11 @@ import {
   deleteProject,
   getLatestProject,
   getProject,
+  TargetAudience,
   updateProjectName,
   updateProjectProductDescription,
   updateProjectRefinedProductDescription,
+  updateProjectReport,
   updateProjectStage,
   updateProjectTargetAudience,
 } from "@/db/projects";
@@ -111,4 +114,42 @@ export async function generateTargetAudienceAction(id: string) {
 
   revalidatePath("/dashboard/projects");
   revalidatePath(`/dashboard/projects/${id}`);
+}
+
+export async function generateReportAction(id: string) {
+  try {
+    revalidatePath("/dashboard/projects");
+    revalidatePath(`/dashboard/projects/${id}`);
+
+    const project = await getProject(id);
+
+    if (!project) {
+      throw new Error("Project not found");
+    }
+
+    if (!project.targetAudience) {
+      throw new Error("Target audience not found");
+    }
+
+    const targetAudience =
+      project.targetAudience as unknown as TargetAudience[];
+
+    const report = await generateReport(targetAudience);
+    const reportJson = JSON.stringify(report);
+
+    try {
+      await updateProjectReport(id, reportJson);
+    } catch (error) {
+      console.error("Failed to save report:", error);
+      throw new Error("Failed to save report to database");
+    }
+
+    await updateProjectStage(id, "report");
+
+    revalidatePath("/dashboard/projects");
+    revalidatePath(`/dashboard/projects/${id}`);
+  } catch (error) {
+    console.error("Error in generateReportAction:", error);
+    throw error;
+  }
 }

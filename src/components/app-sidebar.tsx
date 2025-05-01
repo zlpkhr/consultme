@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  BookOpen,
-  Bot,
-  Command,
-  LifeBuoy,
-  Send,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+import { Command } from "lucide-react";
 import * as React from "react";
 
 import { NavProjects } from "@/components/nav-projects";
@@ -25,27 +17,10 @@ import {
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "Almaz",
+    email: "almaz@consultme.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      emoji: "🎨",
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      emoji: "💼",
-    },
-    {
-      name: "Travel",
-      url: "#",
-      emoji: "🚗",
-    },
-  ],
 };
 
 export function AppSidebar({

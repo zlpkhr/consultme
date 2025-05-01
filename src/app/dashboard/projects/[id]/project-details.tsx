@@ -1,8 +1,10 @@
 "use client";
 
+import { TargetAudience } from "@/db/projects";
 import { Project } from "@/db/schema";
 import { useState } from "react";
 import {
+  generateReportAction,
   generateTargetAudienceAction,
   updateProjectProductDescriptionAction,
   updateProjectStageAction,
@@ -10,8 +12,8 @@ import {
 import { ProductDescriptionForm } from "./product-description-form";
 import { ProjectHeader } from "./project-header";
 import { RefinedProjectDescription } from "./refined-project-description";
+import Report from "./report";
 import { TargetAudienceList } from "./target-audience-list";
-import { TargetAudience } from "@/db/projects";
 
 export function ProjectDetails({
   project,
@@ -19,15 +21,15 @@ export function ProjectDetails({
   project: Project & { stage: string };
 }) {
   const [loading, setLoading] = useState(false);
+  const [generatingTargetAudience, setGeneratingTargetAudience] =
+    useState(false);
+  const [generatingReport, setGeneratingReport] = useState(false);
 
   const handleNext = async (description: string) => {
     setLoading(true);
     await updateProjectProductDescriptionAction(project.id, description);
     setLoading(false);
   };
-
-  const [generatingTargetAudience, setGeneratingTargetAudience] =
-    useState(false);
 
   const handleProjectDescriptionRefinementNext = async () => {
     setGeneratingTargetAudience(true);
@@ -38,6 +40,21 @@ export function ProjectDetails({
   const handleProjectDescriptionRefinementPrevious = async () => {
     setLoading(true);
     await updateProjectStageAction(project.id, "productDescriptionEntry");
+    setLoading(false);
+  };
+
+  const handleTargetAudienceReviewNext = async () => {
+    setGeneratingReport(true);
+    await generateReportAction(project.id);
+    setGeneratingReport(false);
+  };
+
+  const handleTargetAudienceReviewPrevious = async () => {
+    setLoading(true);
+    await updateProjectStageAction(
+      project.id,
+      "refinedProductDescriptionReview"
+    );
     setLoading(false);
   };
 
@@ -63,7 +80,17 @@ export function ProjectDetails({
         generatingTargetAudience) && (
         <TargetAudienceList
           generatingTargetAudience={generatingTargetAudience}
+          generatingReport={generatingReport}
           targetAudience={(project.targetAudience as TargetAudience[]) ?? []}
+          onNext={handleTargetAudienceReviewNext}
+          onPrevious={handleTargetAudienceReviewPrevious}
+        />
+      )}
+      {project.stage === "report" && !generatingReport && (
+        <Report
+          project={project}
+          generatingReport={generatingReport}
+          setGeneratingReport={setGeneratingReport}
         />
       )}
     </div>

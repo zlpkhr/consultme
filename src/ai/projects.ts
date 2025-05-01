@@ -1,3 +1,4 @@
+import { TargetAudience } from "@/db/projects";
 import { openai } from "@ai-sdk/openai";
 import { generateObject, generateText } from "ai";
 import { randomUUID } from "crypto";
@@ -94,4 +95,33 @@ export const generateAvatar = async (person: {
   await writeFile(`./public/avatars/${id}.png`, output);
 
   return `/avatars/${id}.png`;
+};
+
+export const generateReport = async (targetAudience: TargetAudience[]) => {
+  const report = await generateObject({
+    model: openai("gpt-4o"),
+    prompt: `Generate a detailed marketing report for the following target audience personas: ${JSON.stringify(
+      targetAudience
+    )}`,
+    schema: z.object({
+      executiveSummary: z.string(),
+      targetAudienceInsights: z.array(
+        z.object({
+          persona: z.string(),
+          keyInsights: z.array(z.string()),
+          recommendedApproaches: z.array(z.string()),
+        })
+      ),
+      marketingStrategies: z.array(
+        z.object({
+          channel: z.string(),
+          strategy: z.string(),
+          expectedOutcome: z.string(),
+        })
+      ),
+      conclusion: z.string(),
+    }),
+  });
+
+  return report.object;
 };

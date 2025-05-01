@@ -52,9 +52,6 @@ export default function SigninPage() {
     setIsLoading(true);
 
     try {
-      // Here you would typically call your authentication API
-      console.log(values);
-
       // Simulate authentication success
       setTimeout(() => {
         router.push("/dashboard/projects");

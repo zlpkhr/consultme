@@ -16,6 +16,7 @@ export const projects = pgTable("projects", {
   productDescription: text("product_description"),
   refinedProductDescription: text("refined_product_description"),
   targetAudience: jsonb("target_audience"),
+  report: text("report"),
 });
 
 export type Project = typeof projects.$inferSelect;
