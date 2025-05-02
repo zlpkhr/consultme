@@ -116,3 +116,7 @@ export async function updateProjectReport(id: string, report: string) {
     throw error;
   }
 }
+
+export async function updateProjectEmoji(id: string, emoji: string) {
+  await db.update(projects).set({ emoji }).where(eq(projects.id, id));
+}

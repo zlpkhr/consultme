@@ -2,6 +2,8 @@
 
 import {
   generateAvatar,
+  generateProjectEmoji,
+  generateProjectName,
   generateReport,
   generateTargetAudience,
   refindeProductDescription,
@@ -12,6 +14,7 @@ import {
   getLatestProject,
   getProject,
   TargetAudience,
+  updateProjectEmoji,
   updateProjectName,
   updateProjectProductDescription,
   updateProjectRefinedProductDescription,
@@ -70,6 +73,13 @@ export async function updateProjectProductDescriptionAction(
   const refinedDescription = await refindeProductDescription(description);
   await updateProjectRefinedProductDescription(id, refinedDescription);
 
+  const projectName = await generateProjectName(refinedDescription);
+  await updateProjectName(id, projectName);
+
+  const projectEmoji = await generateProjectEmoji(refinedDescription);
+
+  await updateProjectEmoji(id, projectEmoji);
+
   await updateProjectStage(id, "refinedProductDescriptionReview");
 
   revalidatePath("/dashboard/projects");
@@ -101,12 +111,12 @@ export async function generateTargetAudienceAction(id: string) {
     project.productDescription
   );
 
-  const targetAudienceWithAvatars = [] as any;
-
-  for (const person of targetAudience) {
-    const avatar = await generateAvatar(person);
-    targetAudienceWithAvatars.push({ ...person, avatar });
-  }
+  const targetAudienceWithAvatars = await Promise.all(
+    targetAudience.map(async (person) => {
+      const avatar = await generateAvatar(person);
+      return { ...person, avatar };
+    })
+  );
 
   await updateProjectTargetAudience(id, targetAudienceWithAvatars);
 

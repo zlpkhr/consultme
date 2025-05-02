@@ -19,20 +19,24 @@ export const refindeProductDescription = async (description: string) => {
 export const generateTargetAudience = async (description: string) => {
   const targetAudience = await generateObject({
     model: openai("gpt-4o"),
-    prompt: `Generate a target audience for the following product description: ${description}`,
+    prompt: `Generate a target audience for the following product description: ${description}. The target audience should be a list of 6 personas that are the ideal customers for the product.`,
+    system: `You are a senior McKinsey consultant specializing in market research and customer segmentation. Your expertise lies in identifying the most relevant and valuable target audience for a given product. Your task is to analyze the product description and create a detailed profile of the ideal customer.`,
     schema: z.object({
-      targetAudience: z.array(
-        z.object({
-          name: z.string(),
-          age: z.number(),
-          ethnicity: z.string(),
-          country: z.string(),
-          gender: z.string(),
-          location: z.string(),
-          interests: z.array(z.string()),
-          needs: z.array(z.string()),
-        })
-      ),
+      targetAudience: z
+        .array(
+          z.object({
+            name: z.string(),
+            age: z.number(),
+            ethnicity: z.string(),
+            country: z.string(),
+            gender: z.string(),
+            location: z.string(),
+            interests: z.array(z.string()),
+            needs: z.array(z.string()),
+          })
+        )
+        .min(6)
+        .max(6),
     }),
   });
 
@@ -125,3 +129,21 @@ export const generateReport = async (targetAudience: TargetAudience[]) => {
 
   return report.object;
 };
+
+export async function generateProjectName(description: string) {
+  const projectName = await generateText({
+    model: openai("gpt-4o"),
+    prompt: `Generate a descriptive name (2-3 words) that accurately summarizes this project description: ${description}. The name should be literal and descriptive, not creative or marketing-focused.`,
+  });
+
+  return projectName.text;
+}
+
+export async function generateProjectEmoji(description: string) {
+  const projectEmoji = await generateText({
+    model: openai("gpt-4o"),
+    prompt: `Generate a single emoji that best represents this project description: ${description}.`,
+  });
+
+  return projectEmoji.text;
+}
