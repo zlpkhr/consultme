@@ -1,7 +1,8 @@
 "use client";
 
-import { Command } from "lucide-react";
+import { Command, ImageIcon } from "lucide-react";
 import * as React from "react";
+import Link from "next/link";
 
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
@@ -9,6 +10,7 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -65,6 +67,18 @@ export function AppSidebar({
           onDelete={onDelete}
           onCreate={onCreate}
         />
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="/dashboard/ads">
+                  <ImageIcon className="size-4" />
+                  <span>Generate Ads</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />
