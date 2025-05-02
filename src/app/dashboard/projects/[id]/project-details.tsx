@@ -102,6 +102,7 @@ export function ProjectDetails({
           projectId={project.id}
           onPreviousClick={handleChatPrevious}
           onNextClick={handleChatNext}
+          generatingReport={generatingReport}
         />
       )}
       {project.stage === "report" && !generatingReport && (

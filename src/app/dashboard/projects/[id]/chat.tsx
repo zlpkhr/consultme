@@ -3,48 +3,99 @@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ChatEntry } from "@/db/schema";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 interface ChatProps {
   projectId: string;
   onPreviousClick: () => void;
   onNextClick: () => void;
+  generatingReport: boolean;
 }
 
-export function Chat({ projectId, onPreviousClick, onNextClick }: ChatProps) {
+export function Chat({
+  projectId,
+  onPreviousClick,
+  onNextClick,
+  generatingReport,
+}: ChatProps) {
   const [chatEntries, setChatEntries] = useState<ChatEntry[]>([]);
   const [isChatComplete, setIsChatComplete] = useState(false);
+  const lastEventIdRef = useRef<string | null>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   useEffect(() => {
-    let eventSource: EventSource | null = null;
+    if (eventSourceRef.current) {
+      console.log(
+        "Effect run: Closing existing EventSource before initializing."
+      );
+      eventSourceRef.current.close();
+      eventSourceRef.current = null;
+    }
+    setChatEntries([]);
+    setIsChatComplete(false);
+    lastEventIdRef.current = null;
+
+    let isMounted = true;
 
     const initializeChat = async () => {
-      try {
-        const response = await fetch(`/api/projects/chat?id=${projectId}`);
+      if (!isMounted) return;
 
-        if (!response.ok) {
+      try {
+        const initialResponse = await fetch(
+          `/api/projects/chat?id=${projectId}`
+        );
+
+        if (!initialResponse.ok) {
           console.error(
             "Failed to fetch initial chat state:",
-            response.statusText
+            initialResponse.statusText
           );
+          setIsChatComplete(true);
           return;
         }
 
-        const contentType = response.headers.get("content-type");
+        const contentType = initialResponse.headers.get("content-type");
+
+        if (!isMounted) return;
 
         if (contentType && contentType.includes("application/json")) {
-          const completedChatHistory = await response.json();
-          setChatEntries(completedChatHistory);
-          setIsChatComplete(true);
-          console.log("Chat already complete. Loaded history.");
+          const completedChatHistory = await initialResponse.json();
+          if (isMounted) {
+            setChatEntries(completedChatHistory);
+            setIsChatComplete(true);
+            console.log("Chat already complete. Loaded history.");
+          }
         } else if (contentType && contentType.includes("text/event-stream")) {
           console.log("Chat ongoing. Setting up EventSource...");
-          eventSource = new EventSource(`/api/projects/chat?id=${projectId}`);
 
-          eventSource.onmessage = (event) => {
+          if (eventSourceRef.current) {
+            console.warn(
+              "initializeChat: Found unexpected existing EventSource. Closing it."
+            );
+            eventSourceRef.current.close();
+          }
+
+          eventSourceRef.current = new EventSource(
+            `/api/projects/chat?id=${projectId}`
+          );
+
+          eventSourceRef.current.onmessage = (event) => {
+            if (!isMounted) return;
+            if (event.lastEventId) {
+              lastEventIdRef.current = event.lastEventId;
+            } else {
+            }
+
             try {
-              const data = JSON.parse(event.data);
-              setChatEntries((prevEntries) => [...prevEntries, data]);
+              const newEntry: ChatEntry = JSON.parse(event.data);
+              if (isMounted) {
+                setChatEntries((prevEntries) => {
+                  if (prevEntries.some((entry) => entry.id === newEntry.id)) {
+                    return prevEntries;
+                  }
+                  return [...prevEntries, newEntry];
+                });
+              }
             } catch (error) {
               console.error(
                 "Failed to parse SSE data:",
@@ -55,25 +106,35 @@ export function Chat({ projectId, onPreviousClick, onNextClick }: ChatProps) {
             }
           };
 
-          eventSource.onerror = (error) => {
+          eventSourceRef.current.onerror = (error) => {
+            if (!isMounted) return;
             console.error("EventSource failed:", error);
             setIsChatComplete(true);
-            eventSource?.close();
+            eventSourceRef.current?.close();
+            eventSourceRef.current = null;
           };
         } else {
           console.error("Unexpected content type received:", contentType);
+          if (isMounted) {
+            setIsChatComplete(true);
+          }
         }
       } catch (error) {
         console.error("Error initializing chat:", error);
+        if (isMounted) {
+          setIsChatComplete(true);
+        }
       }
     };
 
     initializeChat();
 
     return () => {
-      if (eventSource) {
-        console.log("Closing EventSource.");
-        eventSource.close();
+      isMounted = false;
+      if (eventSourceRef.current) {
+        console.log("Cleanup: Closing EventSource.");
+        eventSourceRef.current.close();
+        eventSourceRef.current = null;
       }
     };
   }, [projectId]);
@@ -120,7 +181,9 @@ export function Chat({ projectId, onPreviousClick, onNextClick }: ChatProps) {
           Previous
         </Button>
         {isChatComplete && (
-          <Button onClick={onNextClick}>Next: View Report</Button>
+          <Button onClick={onNextClick} disabled={generatingReport}>
+            Next: View Report
+          </Button>
         )}
       </div>
     </div>
