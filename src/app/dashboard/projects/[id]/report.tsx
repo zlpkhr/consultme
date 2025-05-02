@@ -22,6 +22,7 @@ import { generatePDF } from "@/lib/pdf";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { generateReportAction } from "../actions";
+import { TargetAudience } from "@/db/projects";
 interface ReportData {
   executiveSummary: string;
   targetAudienceInsights: {
@@ -222,7 +223,11 @@ export default function Report({
         <Button
           onClick={() =>
             router.push(
-              `/dashboard/ads?product=${project.productDescription}&audience=${project.targetAudience}`
+              `/dashboard/ads?product=${
+                project.productDescription
+              }&audience=${serializeTargetAudience(
+                project.targetAudience as any
+              )}`
             )
           }
           disabled={loading}
@@ -232,4 +237,21 @@ export default function Report({
       </CardFooter>
     </Card>
   );
+}
+
+function serializeTargetAudience(targetAudience: TargetAudience[]) {
+  return targetAudience
+    .map(
+      (audience) =>
+        `Name: ${audience.name}
+Age: ${audience.age}
+Ethnicity: ${audience.ethnicity}
+Country: ${audience.country}
+Gender: ${audience.gender}
+Location: ${audience.location}
+Interests: ${audience.interests.join(", ")}
+Needs: ${audience.needs.join(", ")}
+Avatar: ${audience.avatar}`
+    )
+    .join("\n\n");
 }
