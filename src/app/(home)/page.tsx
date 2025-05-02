@@ -50,7 +50,7 @@ export default function Page() {
     ];
 
     return (
-      <section aria-labelledby="benefits-title" className="mx-auto mt-44">
+      <section aria-labelledby="benefits-title" className="mx-auto pt-[70px]">
         <h2
           id="benefits-title"
           className="inline-block bg-gradient-to-t from-blue-900 to-blue-800 bg-clip-text py-2 text-4xl font-bold tracking-tighter text-transparent md:text-5xl dark:from-blue-50 dark:to-blue-300"

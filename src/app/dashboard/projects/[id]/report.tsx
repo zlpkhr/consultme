@@ -19,9 +19,9 @@ import {
 } from "@/components/ui/table";
 import { Project } from "@/db/schema";
 import { generatePDF } from "@/lib/pdf";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { generateReportAction } from "../actions";
-
 interface ReportData {
   executiveSummary: string;
   targetAudienceInsights: {
@@ -50,6 +50,7 @@ export default function Report({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const router = useRouter();
   useEffect(() => {
     if (project.report) {
       try {
@@ -214,9 +215,19 @@ export default function Report({
         </section>
       </CardContent>
 
-      <CardFooter className="flex justify-center">
+      <CardFooter className="flex justify-center gap-4">
         <Button onClick={handleDownloadReport} disabled={!report || loading}>
           {loading ? "Generating PDF..." : "Download PDF"}
+        </Button>
+        <Button
+          onClick={() =>
+            router.push(
+              `/dashboard/ads?product=${project.productDescription}&audience=${project.targetAudience}`
+            )
+          }
+          disabled={loading}
+        >
+          Generate Add
         </Button>
       </CardFooter>
     </Card>

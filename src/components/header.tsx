@@ -35,7 +35,7 @@ export default function Header() {
         <div className="relative flex items-center justify-between">
           <Link href="/" aria-label="Home">
             <span className="sr-only">Company logo</span>
-            <p className="w-28 font-bold md:w-32">WAYIN</p>
+            <p className="w-28 font-bold md:w-32">ConsultMe</p>
           </Link>
           <nav className="hidden md:absolute md:top-1/2 md:left-1/2 md:block md:-translate-x-1/2 md:-translate-y-1/2">
             <div className="flex items-center gap-10 font-medium"></div>
