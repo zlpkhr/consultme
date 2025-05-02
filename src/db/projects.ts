@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { projects } from "@/db/schema";
+import { projects, ChatEntry } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 
 export async function getProjects() {
@@ -119,4 +119,8 @@ export async function updateProjectReport(id: string, report: string) {
 
 export async function updateProjectEmoji(id: string, emoji: string) {
   await db.update(projects).set({ emoji }).where(eq(projects.id, id));
+}
+
+export async function updateProjectChat(id: string, chat: ChatEntry[]) {
+  await db.update(projects).set({ chat }).where(eq(projects.id, id));
 }

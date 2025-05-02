@@ -14,6 +14,7 @@ import { ProjectHeader } from "./project-header";
 import { RefinedProjectDescription } from "./refined-project-description";
 import Report from "./report";
 import { TargetAudienceList } from "./target-audience-list";
+import { Chat } from "./chat";
 
 export function ProjectDetails({
   project,
@@ -44,9 +45,7 @@ export function ProjectDetails({
   };
 
   const handleTargetAudienceReviewNext = async () => {
-    setGeneratingReport(true);
-    await generateReportAction(project.id);
-    setGeneratingReport(false);
+    await updateProjectStageAction(project.id, "chat");
   };
 
   const handleTargetAudienceReviewPrevious = async () => {
@@ -56,6 +55,18 @@ export function ProjectDetails({
       "refinedProductDescriptionReview"
     );
     setLoading(false);
+  };
+
+  const handleChatPrevious = async () => {
+    setLoading(true);
+    await updateProjectStageAction(project.id, "targetAudienceReview");
+    setLoading(false);
+  };
+
+  const handleChatNext = async () => {
+    setGeneratingReport(true);
+    await generateReportAction(project.id);
+    setGeneratingReport(false);
   };
 
   return (
@@ -84,6 +95,13 @@ export function ProjectDetails({
           targetAudience={(project.targetAudience as TargetAudience[]) ?? []}
           onNext={handleTargetAudienceReviewNext}
           onPrevious={handleTargetAudienceReviewPrevious}
+        />
+      )}
+      {project.stage === "chat" && (
+        <Chat
+          projectId={project.id}
+          onPreviousClick={handleChatPrevious}
+          onNextClick={handleChatNext}
         />
       )}
       {project.stage === "report" && !generatingReport && (
