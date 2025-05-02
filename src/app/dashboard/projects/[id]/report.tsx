@@ -223,10 +223,10 @@ export default function Report({
         <Button
           onClick={() =>
             router.push(
-              `/dashboard/ads?product=${
-                project.productDescription
-              }&audience=${serializeTargetAudience(
-                project.targetAudience as any
+              `/dashboard/ads?product=${encodeURIComponent(
+                project.productDescription ?? ""
+              )}&audience=${encodeURIComponent(
+                serializeTargetAudience(project.targetAudience as any) ?? ""
               )}`
             )
           }
@@ -240,6 +240,10 @@ export default function Report({
 }
 
 function serializeTargetAudience(targetAudience: TargetAudience[]) {
+  if (!targetAudience) return "";
+
+  if (targetAudience.length === 0) return "";
+
   return targetAudience
     .map(
       (audience) =>
